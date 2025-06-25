@@ -1,0 +1,17 @@
+{
+  "mcpServers": {    
+    "server-puppeteer": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-puppeteer"
+      ],
+      "transport": {
+        "type": "stdio"
+      },
+      "env": {},
+      "disabled": false,
+      "autoApprove": []
+    }
+  }
+}
