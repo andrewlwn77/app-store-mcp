@@ -1,5 +1,5 @@
 {
-  "name": "app-store-mcp",
+  "name": "@andrewlwn77/app-store-mcp",
   "version": "1.0.0",
   "description": "MCP server for App Store API integration - Access Apple App Store and Google Play Store data",
   "main": "dist/index.js",
@@ -31,12 +31,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yourusername/app-store-mcp.git"
+    "url": "git+https://github.com/andrewlwn77/app-store-mcp.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/app-store-mcp/issues"
+    "url": "https://github.com/andrewlwn77/app-store-mcp/issues"
   },
-  "homepage": "https://github.com/yourusername/app-store-mcp#readme",
+  "homepage": "https://github.com/andrewlwn77/app-store-mcp#readme",
   "engines": {
     "node": ">=16.0.0"
   },

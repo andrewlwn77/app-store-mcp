@@ -1,6 +1,6 @@
 # App Store MCP Server
 
-[![npm version](https://badge.fury.io/js/app-store-mcp.svg)](https://www.npmjs.com/package/app-store-mcp)
+[![npm version](https://badge.fury.io/js/%40andrewlwn77%2Fapp-store-mcp.svg)](https://www.npmjs.com/package/@andrewlwn77/app-store-mcp)
 
 ⚠️ **IMPORTANT SECURITY NOTICE**: Never commit API keys to version control. This package requires an API key to be set via environment variable.
 
@@ -21,12 +21,12 @@ An MCP (Model Context Protocol) server that provides access to app store data fr
 export APP_STORE_API_KEY="your-api-key-here"
 
 # Run directly with npx
-npx app-store-mcp
+npx @andrewlwn77/app-store-mcp
 ```
 
 ### Option 2: Global Installation
 ```bash
-npm install -g app-store-mcp
+npm install -g @andrewlwn77/app-store-mcp
 ```
 
 ### Option 3: Local Development
