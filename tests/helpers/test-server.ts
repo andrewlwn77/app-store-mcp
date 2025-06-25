@@ -14,7 +14,10 @@ import {
 
 dotenv.config();
 
-const API_KEY = process.env.APP_STORE_API_KEY || 'YOUR_API_KEY_HERE';
+const API_KEY = process.env.APP_STORE_API_KEY;
+if (!API_KEY) {
+  throw new Error('APP_STORE_API_KEY environment variable is required for tests');
+}
 const API_HOST = 'app-stores.p.rapidapi.com';
 
 export class AppStoreTestClient {

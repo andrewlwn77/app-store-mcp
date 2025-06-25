@@ -1,25 +1,50 @@
 {
   "name": "app-store-mcp",
   "version": "1.0.0",
-  "description": "MCP server for App Store API integration",
+  "description": "MCP server for App Store API integration - Access Apple App Store and Google Play Store data",
   "main": "dist/index.js",
   "type": "module",
+  "bin": {
+    "app-store-mcp": "./dist/index.js"
+  },
   "scripts": {
     "build": "tsc",
+    "postbuild": "chmod +x dist/index.js",
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts",
     "test": "jest",
     "test:unit": "jest tests/unit",
     "test:integration": "jest tests/integration",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "mcp",
+    "model-context-protocol",
     "app-store",
-    "api"
+    "google-play",
+    "apple-app-store",
+    "api",
+    "rapidapi"
   ],
   "author": "",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/app-store-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/app-store-mcp/issues"
+  },
+  "homepage": "https://github.com/yourusername/app-store-mcp#readme",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.4",
     "axios": "^1.7.8",

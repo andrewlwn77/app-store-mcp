@@ -1,0 +1,47 @@
+# Source files
+src/
+tests/
+
+# Config files
+tsconfig.json
+jest.config.js
+.env
+.env.*
+
+# Development files
+*.ts
+!dist/*.d.ts
+test-server.js
+clean-git-history.sh
+examples.txt
+
+# Git and IDE
+.git/
+.gitignore
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs and coverage
+*.log
+coverage/
+.nyc_output/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# CI/CD
+.github/
+.travis.yml
+.circleci/
+
+# Documentation source
+docs/
+CLAUDE.md
+
+# Misc
+*.tsbuildinfo
+node_modules/
+package-lock.json

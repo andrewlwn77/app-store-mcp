@@ -1,5 +1,9 @@
 # App Store MCP Server
 
+[![npm version](https://badge.fury.io/js/app-store-mcp.svg)](https://www.npmjs.com/package/app-store-mcp)
+
+⚠️ **IMPORTANT SECURITY NOTICE**: Never commit API keys to version control. This package requires an API key to be set via environment variable.
+
 An MCP (Model Context Protocol) server that provides access to app store data from both Apple App Store and Google Play Store through the App Stores API.
 
 ## Features
@@ -11,37 +15,56 @@ An MCP (Model Context Protocol) server that provides access to app store data fr
 
 ## Installation
 
-1. Clone the repository:
+### Option 1: Using npx (Recommended)
+```bash
+# Set your API key first
+export APP_STORE_API_KEY="your-api-key-here"
+
+# Run directly with npx
+npx app-store-mcp
+```
+
+### Option 2: Global Installation
+```bash
+npm install -g app-store-mcp
+```
+
+### Option 3: Local Development
 ```bash
 git clone <repository-url>
 cd app-store-mcp
-```
-
-2. Install dependencies:
-```bash
 npm install
-```
-
-3. Set up your API key:
-   - Copy `.env.example` to `.env`
-   - Get an API key from [RapidAPI App Stores](https://rapidapi.com/marketplace/api/app-stores)
-   - Add your key to the `.env` file
-
-4. Build the TypeScript code:
-```bash
 npm run build
 ```
+
+## Configuration
+
+**Required**: You must set the `APP_STORE_API_KEY` environment variable before running the server.
+
+1. Get an API key from [RapidAPI App Stores](https://rapidapi.com/marketplace/api/app-stores)
+2. Set the environment variable:
+   ```bash
+   # Option 1: Export in your shell
+   export APP_STORE_API_KEY="your-api-key-here"
+   
+   # Option 2: Create a .env file (for local development)
+   echo "APP_STORE_API_KEY=your-api-key-here" > .env
+   ```
+
+⚠️ **Security**: Never commit your `.env` file or API key to version control!
 
 ## Usage
 
 ### Running the server
 
 ```bash
-npm start
-```
+# If installed globally or using npx
+app-store-mcp
 
-For development with auto-reload:
-```bash
+# For local development
+npm start
+
+# For development with auto-reload
 npm run dev
 ```
 

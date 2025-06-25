@@ -24,7 +24,13 @@ import {
 
 dotenv.config();
 
-const API_KEY = process.env.APP_STORE_API_KEY || 'YOUR_API_KEY_HERE';
+const API_KEY = process.env.APP_STORE_API_KEY;
+if (!API_KEY) {
+  console.error('Error: APP_STORE_API_KEY environment variable is required');
+  console.error('Please set it in your .env file or environment');
+  console.error('Get your API key from: https://rapidapi.com/apimaker/api/app-stores');
+  process.exit(1);
+}
 const API_HOST = 'app-stores.p.rapidapi.com';
 
 class AppStoreMcpServer {
