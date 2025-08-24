@@ -33,7 +33,11 @@ Add to your `claude_desktop_config.json`:
       "command": "npx",
       "args": ["-y", "@andrewlwn77/app-store-mcp"],
       "env": {
-        "APP_STORE_API_KEY": "your-api-key-here"
+        "APP_STORE_API_KEY": "your-api-key-here",
+        "CACHE_ENABLED": "true",
+        "CACHE_TTL_SECONDS": "300",
+        "CACHE_MAX_ENTRIES": "100", 
+        "RESULTS_PER_PAGE": "10"
       }
     }
   }
@@ -50,7 +54,11 @@ Add to your MCP configuration (User Settings JSON or `.vscode/mcp.json`):
       "command": "npx", 
       "args": ["-y", "@andrewlwn77/app-store-mcp"],
       "env": {
-        "APP_STORE_API_KEY": "your-api-key-here"
+        "APP_STORE_API_KEY": "your-api-key-here",
+        "CACHE_ENABLED": "true",
+        "CACHE_TTL_SECONDS": "300",
+        "CACHE_MAX_ENTRIES": "100",
+        "RESULTS_PER_PAGE": "10"
       }
     }
   }
