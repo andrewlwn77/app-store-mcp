@@ -15,12 +15,9 @@ import {
   SearchParams,
   DetailsParams,
   ReviewsParams,
-  AutocompleteResponse,
-  SearchResponse,
-  DetailsResponse,
-  ReviewsResponse,
   ApiError
 } from './types.js';
+import { CacheManager, paginateResults } from './cache.js';
 
 dotenv.config();
 
@@ -35,8 +32,12 @@ const API_HOST = 'app-stores.p.rapidapi.com';
 
 class AppStoreMcpServer {
   private server: Server;
+  private cache: CacheManager;
+  private cacheEnabled: boolean;
 
   constructor() {
+    this.cache = new CacheManager();
+    this.cacheEnabled = process.env.CACHE_ENABLED !== 'false';
     this.server = new Server(
       {
         name: 'app-store-mcp',
@@ -110,6 +111,15 @@ class AppStoreMcpServer {
               description: 'Language code (e.g., "en")',
               default: 'en',
             },
+            page: {
+              type: 'number',
+              description: 'Page number (1-based)',
+              default: 1,
+            },
+            pageSize: {
+              type: 'number',
+              description: 'Number of results per page',
+            },
           },
           required: ['store', 'term'],
         },
@@ -133,6 +143,15 @@ class AppStoreMcpServer {
               type: 'string',
               description: 'Language code (e.g., "en")',
               default: 'en',
+            },
+            page: {
+              type: 'number',
+              description: 'Page number (1-based)',
+              default: 1,
+            },
+            pageSize: {
+              type: 'number',
+              description: 'Number of results per page',
             },
           },
           required: ['store', 'term'],
@@ -182,6 +201,15 @@ class AppStoreMcpServer {
               description: 'Language code (e.g., "en")',
               default: 'en',
             },
+            page: {
+              type: 'number',
+              description: 'Page number (1-based)',
+              default: 1,
+            },
+            pageSize: {
+              type: 'number',
+              description: 'Number of results per page',
+            },
           },
           required: ['store', 'id'],
         },
@@ -209,21 +237,57 @@ class AppStoreMcpServer {
 
   private async handleAutocomplete(params: AutocompleteParams) {
     const store = this.validateStore(params.store);
+    const cacheKey = this.cache.generateKey('autocomplete', { store, term: params.term, language: params.language });
+    
+    // Try cache first
+    let allSuggestions: any[] = [];
+    if (this.cacheEnabled) {
+      const cached = this.cache.get(cacheKey);
+      if (cached) {
+        allSuggestions = cached.suggestions || [];
+        const paginated = paginateResults(allSuggestions, { page: params.page, pageSize: params.pageSize });
+        
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                suggestions: paginated.data,
+                pagination: paginated.pagination,
+                cached: true
+              }, null, 2),
+            },
+          ],
+        };
+      }
+    }
+
+    // Make API request
     const data = await this.makeApiRequest('autocomplete', {
       store,
       term: params.term,
       language: params.language || 'en',
     });
 
-    const response: AutocompleteResponse = {
-      suggestions: data.suggestions || data || [],
-    };
+    allSuggestions = data.suggestions || data || [];
+    
+    // Cache the full results
+    if (this.cacheEnabled && allSuggestions.length > 0) {
+      this.cache.set(cacheKey, { suggestions: allSuggestions });
+    }
+
+    // Return paginated results
+    const paginated = paginateResults(allSuggestions, { page: params.page, pageSize: params.pageSize });
 
     return {
       content: [
         {
           type: 'text',
-          text: JSON.stringify(response, null, 2),
+          text: JSON.stringify({
+            suggestions: paginated.data,
+            pagination: paginated.pagination,
+            cached: false
+          }, null, 2),
         },
       ],
     };
@@ -231,21 +295,57 @@ class AppStoreMcpServer {
 
   private async handleSearch(params: SearchParams) {
     const store = this.validateStore(params.store);
+    const cacheKey = this.cache.generateKey('search', { store, term: params.term, language: params.language });
+    
+    // Try cache first
+    let allResults: any[] = [];
+    if (this.cacheEnabled) {
+      const cached = this.cache.get(cacheKey);
+      if (cached) {
+        allResults = cached.results || [];
+        const paginated = paginateResults(allResults, { page: params.page, pageSize: params.pageSize });
+        
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                results: paginated.data,
+                pagination: paginated.pagination,
+                cached: true
+              }, null, 2),
+            },
+          ],
+        };
+      }
+    }
+
+    // Make API request
     const data = await this.makeApiRequest('search', {
       store,
       term: params.term,
       language: params.language || 'en',
     });
 
-    const response: SearchResponse = {
-      results: data.results || data || [],
-    };
+    allResults = data.results || data || [];
+    
+    // Cache the full results
+    if (this.cacheEnabled && allResults.length > 0) {
+      this.cache.set(cacheKey, { results: allResults });
+    }
+
+    // Return paginated results
+    const paginated = paginateResults(allResults, { page: params.page, pageSize: params.pageSize });
 
     return {
       content: [
         {
           type: 'text',
-          text: JSON.stringify(response, null, 2),
+          text: JSON.stringify({
+            results: paginated.data,
+            pagination: paginated.pagination,
+            cached: false
+          }, null, 2),
         },
       ],
     };
@@ -253,21 +353,46 @@ class AppStoreMcpServer {
 
   private async handleDetails(params: DetailsParams) {
     const store = this.validateStore(params.store);
+    const cacheKey = this.cache.generateKey('details', { store, id: params.id, language: params.language });
+    
+    // Try cache first
+    if (this.cacheEnabled) {
+      const cached = this.cache.get(cacheKey);
+      if (cached) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                app: cached.app,
+                cached: true
+              }, null, 2),
+            },
+          ],
+        };
+      }
+    }
+
+    // Make API request
     const data = await this.makeApiRequest('details', {
       store,
       id: params.id,
       language: params.language || 'en',
     });
 
-    const response: DetailsResponse = {
-      app: data,
-    };
+    // Cache the result
+    if (this.cacheEnabled) {
+      this.cache.set(cacheKey, { app: data });
+    }
 
     return {
       content: [
         {
           type: 'text',
-          text: JSON.stringify(response, null, 2),
+          text: JSON.stringify({
+            app: data,
+            cached: false
+          }, null, 2),
         },
       ],
     };
@@ -275,21 +400,57 @@ class AppStoreMcpServer {
 
   private async handleReviews(params: ReviewsParams) {
     const store = this.validateStore(params.store);
+    const cacheKey = this.cache.generateKey('reviews', { store, id: params.id, language: params.language });
+    
+    // Try cache first
+    let allReviews: any[] = [];
+    if (this.cacheEnabled) {
+      const cached = this.cache.get(cacheKey);
+      if (cached) {
+        allReviews = cached.reviews || [];
+        const paginated = paginateResults(allReviews, { page: params.page, pageSize: params.pageSize });
+        
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                reviews: paginated.data,
+                pagination: paginated.pagination,
+                cached: true
+              }, null, 2),
+            },
+          ],
+        };
+      }
+    }
+
+    // Make API request
     const data = await this.makeApiRequest('reviews', {
       store,
       id: params.id,
       language: params.language || 'en',
     });
 
-    const response: ReviewsResponse = {
-      reviews: data.reviews || data || [],
-    };
+    allReviews = data.reviews || data || [];
+    
+    // Cache the full results
+    if (this.cacheEnabled && allReviews.length > 0) {
+      this.cache.set(cacheKey, { reviews: allReviews });
+    }
+
+    // Return paginated results
+    const paginated = paginateResults(allReviews, { page: params.page, pageSize: params.pageSize });
 
     return {
       content: [
         {
           type: 'text',
-          text: JSON.stringify(response, null, 2),
+          text: JSON.stringify({
+            reviews: paginated.data,
+            pagination: paginated.pagination,
+            cached: false
+          }, null, 2),
         },
       ],
     };

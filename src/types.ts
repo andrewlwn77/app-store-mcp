@@ -6,6 +6,8 @@ export enum Store {
 export interface BaseParams {
   store: Store;
   language?: string;
+  page?: number;
+  pageSize?: number;
 }
 
 export interface AutocompleteParams extends BaseParams {

@@ -15,21 +15,51 @@ An MCP (Model Context Protocol) server that provides access to app store data fr
 
 ## Installation
 
-### Option 1: Using npx (Recommended)
-```bash
-# Set your API key first
-export APP_STORE_API_KEY="your-api-key-here"
+This MCP server is designed to be used with MCP-compatible applications like Claude Desktop, VS Code with Copilot, or other MCP clients.
 
-# Run directly with npx
-npx @andrewlwn77/app-store-mcp
+### MCP Client Configuration
+
+Add this server to your MCP client configuration:
+
+#### Claude Desktop
+Add to your `claude_desktop_config.json`:
+```json
+{
+  "mcpServers": {
+    "app-store": {
+      "command": "npx",
+      "args": ["-y", "@andrewlwn77/app-store-mcp"],
+      "env": {
+        "APP_STORE_API_KEY": "your-api-key-here"
+      }
+    }
+  }
+}
 ```
 
-### Option 2: Global Installation
+#### VS Code with GitHub Copilot
+Add to your MCP configuration (User Settings JSON or `.vscode/mcp.json`):
+```json
+{
+  "servers": {
+    "app-store": {
+      "type": "stdio",
+      "command": "npx", 
+      "args": ["-y", "@andrewlwn77/app-store-mcp"],
+      "env": {
+        "APP_STORE_API_KEY": "your-api-key-here"
+      }
+    }
+  }
+}
+```
+
+### Direct Installation (for development)
 ```bash
 npm install -g @andrewlwn77/app-store-mcp
 ```
 
-### Option 3: Local Development
+### Local Development
 ```bash
 git clone <repository-url>
 cd app-store-mcp
@@ -41,7 +71,7 @@ npm run build
 
 **Required**: You must set the `APP_STORE_API_KEY` environment variable before running the server.
 
-1. Get an API key from [RapidAPI App Stores](https://rapidapi.com/marketplace/api/app-stores)
+1. Get an API key from [RapidAPI App Stores](https://rapidapi.com/danielamitay/api/app-stores)
 2. Set the environment variable:
    ```bash
    # Option 1: Export in your shell
@@ -55,18 +85,20 @@ npm run build
 
 ## Usage
 
-### Running the server
+### Testing the Server
 
 ```bash
-# If installed globally or using npx
-app-store-mcp
-
-# For local development
+# For local development and testing
 npm start
 
 # For development with auto-reload
 npm run dev
+
+# Test the server directly (requires MCP client)
+npx -y @andrewlwn77/app-store-mcp
 ```
+
+**Note**: This server is designed to be used through MCP clients. Direct execution will wait for MCP protocol messages via stdin.
 
 ### Available Tools
 
@@ -102,30 +134,16 @@ Get reviews for a specific app.
 - `id` (required): App ID (bundle ID for iOS, package name for Android)
 - `language` (optional): Language code (default: "en")
 
-### Example Usage with MCP Client
+### Example Usage
 
-```typescript
-// Search for apps
-const searchResult = await client.callTool('app_store_search', {
-  store: 'google',
-  term: 'meditation',
-  language: 'en'
-});
+Once configured with an MCP client, you can use natural language to interact with the tools:
 
-// Get app details
-const appDetails = await client.callTool('app_store_details', {
-  store: 'apple',
-  id: 'com.spotify.client',
-  language: 'en'
-});
+- "Search for meditation apps on Google Play Store"
+- "Get details for Spotify on the Apple App Store" 
+- "Show me recent reviews for Snapchat on Android"
+- "Find app suggestions for 'photo editing' on iOS"
 
-// Get app reviews
-const reviews = await client.callTool('app_store_reviews', {
-  store: 'google',
-  id: 'com.snapchat.android',
-  language: 'en'
-});
-```
+The server will automatically handle the API calls and return formatted results.
 
 ## Configuration
 
